@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS deploy_lab
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE deploy_lab;
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id         INT PRIMARY KEY AUTO_INCREMENT,
+  title      VARCHAR(255) NOT NULL,
+  status     VARCHAR(50)  NOT NULL DEFAULT 'todo',
+  created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+);
