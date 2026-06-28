@@ -1,0 +1,20 @@
+# 基础镜像:Node 20 LTS 的 Alpine 版,体积小、够用
+FROM node:20-alpine
+
+# 容器内工作目录
+WORKDIR /app
+
+# 关键:先只拷「依赖描述文件」,再装依赖
+# 这样只要依赖没变,这一层就能命中缓存,改业务代码 rebuild 会快很多
+COPY package.json package-lock.json ./
+# --omit=dev:nodemon 这类开发依赖不打进生产镜像
+RUN npm ci --omit=dev
+
+# 依赖装好后再拷业务代码(改动最频繁的放最后)
+COPY src ./src
+
+# 文档性声明:容器内监听 3000(不会自动对外发布,对外发布靠 docker run 的 -p)
+EXPOSE 3000
+
+# 生产环境用 node 直接跑,不用 nodemon
+CMD ["node", "src/app.js"]
