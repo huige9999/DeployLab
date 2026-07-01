@@ -5,6 +5,7 @@ type Health = {
   status?: string;
   db?: string;
   redis?: string;
+  request_count?: number;
   version?: string;
 };
 
@@ -67,6 +68,12 @@ async function loadHealth() {
   }
 }
 
+// ---- 访问计数 ----
+const stats = ref<{request_count:number} | null>(null);
+async function loadStats() {
+  stats.value = await API('/stats');
+}
+
 onMounted(() => {
   loadTasks();
   loadHealth();
@@ -80,7 +87,7 @@ onMounted(() => {
     <nav>
       <button :class="{ on: tab === 'list' }" @click="tab = 'list'">任务列表</button>
       <button :class="{ on: tab === 'new' }" @click="tab = 'new'">新增任务</button>
-      <button :class="{ on: tab === 'status' }" @click="tab = 'status'; loadHealth()">
+      <button :class="{ on: tab === 'status' }" @click="tab = 'status'; loadHealth(); loadStats();">
         系统状态
       </button>
     </nav>
@@ -119,7 +126,8 @@ onMounted(() => {
       <ul>
         <li>后端状态:{{ health?.status ?? '...' }}</li>
         <li>MySQL 状态:{{ health?.db ?? '...' }}</li>
-        <li>Redis 状态:{{ health?.redis ?? '...' }}(第 4 阶段接入)</li>
+        <li>Redis 状态:{{ health?.redis ?? '...' }}</li>
+        <li>访问计数:{{ stats?.request_count ?? '...' }}</li>
         <li>当前部署版本:{{ health?.version ?? '...' }}</li>
       </ul>
     </section>
